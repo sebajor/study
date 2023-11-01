@@ -1,0 +1,1 @@
+g++ test.cpp -o test -L/usr/lib -lfftw3 && ./test

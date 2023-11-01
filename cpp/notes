@@ -1,0 +1,36 @@
+
+C++  support 4 programming stypes:
+
+- Procedural programing: focus in process and the design of suitable data structures.
+- Data abstraction: focus in design of interfaces to hide the complexity.
+- Objject oriented programming: focus on class hierarchies.
+- Generic programming: Design and use of general algorithms.
+
+C++11 rules of thumbs:
+1- Use constructors to stablish invariants
+2- Use constructors/destructors pairs to simplify resource management.
+3- Avoid naked new and delete
+4- Use containers and algorithms rather built in arrays and ad-hoc code.
+5- Prefer the standard library
+6- Use exceptions rather error codes
+7- Use move semantics to avoid copying larger objects
+8- Use unique_ptr to reference objects of polymorphic type
+9- Use shared_ptr to reference shared objects (objects without a single owner)
+10- Use templates to mantain static type safety.
+
+-------------------------------------------------------------------------------
+C++ is a compiled language, the source code needs to be compiled to an object file which are combined by a linker yielding an executable file.
+
+Usually you have to tell in which namespace a certain object lives eg: std::cout. You could also start the script telling which is going to be the stadard namespace telling: use namespace std
+
+When defining a variable you dont need to state the data type.. C++ introduce the auto keyword where the compiler deduce the type of the initialization.
+eg: auto a = 1;
+    auto b = true;
+
+The keyword const is a promise that the value will not be changed. The keyword constexpr means that the expression will be evaluated when compiling.
+eg: const int d = 1;
+    int a = 2
+    constexpr double max = 1.4*square(d);   ##the expression inside square will be evaluated and used as const
+    constexpr double max1 = 1.4*square(a)   ##error since a is not a const expression.
+
+
