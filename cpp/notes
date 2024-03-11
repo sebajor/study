@@ -3,7 +3,7 @@ C++  support 4 programming stypes:
 
 - Procedural programing: focus in process and the design of suitable data structures.
 - Data abstraction: focus in design of interfaces to hide the complexity.
-- Objject oriented programming: focus on class hierarchies.
+- Object oriented programming: focus on class hierarchies.
 - Generic programming: Design and use of general algorithms.
 
 C++11 rules of thumbs:
@@ -32,5 +32,521 @@ eg: const int d = 1;
     int a = 2
     constexpr double max = 1.4*square(d);   ##the expression inside square will be evaluated and used as const
     constexpr double max1 = 1.4*square(a)   ##error since a is not a const expression.
+
+
+--------------------------------------------------------------------------------------------------------------
+std::cout << "something";
+char ans = 0;
+std::cin >> ans;     //obtain the standard input stream, the >> means get from
+
+------------------------------------------------------------------------------
+pointers:
+char v[6];
+char* p= &v[3]  %%point the address of the fourth element.
+char x = *p;    %% *p is the object that p points to (ie v[3])
+
+* prefix means the content of a given address
+& prefix means the address of an object
+
+------------------------------------------------------------------------------
+language trick:
+int v[]={0,1,2,3,4,5,6,7,8,9};
+for(auto x:v)   //for each x in v
+    cout << x << '\n';
+for(auto x: {10,21,32}  //for x in 10,21,32 
+    cout << x << '\n';
+
+in this case the values of v are copied in x.. if we only want to refer to it we could use
+for( auto& x:v)
+    ++x;
+
+In this case the & means "reference to".
+
+The standard is that a pointer always points something.. you could use mullptr when the pointer is not being used.
+A single nullptr is shared between all the pointers.
+------------------------------------------------------------------------------
+user-defined types:
+
+Struct:
+struct Vector {
+    int sz; //nr of elements
+    double* element;    
+    }
+
+To initialize the vector he creates function
+void vector_init(Vector& v, int s){
+    v.element = new double[s];
+    v.sz = s;
+}
+
+the new operator allocates memory from an area for the data in the dynamic memory and heap
+We use . to access the item by name and -> to access via a pointer.
+
+void f(Vector v, Vector& rv, Vector* pv){
+    int i1 = v.sz;
+    int i2 = rv.sz;
+    int i3 = pv->sz;
+}
+
+------------------------------------------------------------------------------
+Classes:
+
+class Vector{
+    public:
+        Vector(int s): elem{new double[s]}, sz{s}{} //construct a vector
+        double &operator[](int i) {return elem[i];} //element access
+        int size(){return sz;}
+    private:
+        double* elem;
+        int sz;
+};
+
+Then we can create a Vector as: Vector v(6);
+In the class the elements can only be accessed by the public functions, Vector(),
+the operator [] and size.
+
+
+A function with the same name as the class is the constructor.
+
+
+-------------------------------------------------------------------------------
+Enumerations:
+
+enum class Color {red,blue, green};
+enum class traffic {red, green, yellow};
+
+Color col = Color::red;
+
+The enums are used to save objects and differentiate them from others (for ex there are red and green values in colors and traffic)... so if we call red we actually dont know which one are we using.
+
+if you dont put the object type after the enum it assumes that is an int.
+
+-------------------------------------------------------------------------------
+separated compilation:
+First we need to build a header file telling the objects to implement:
+//Vector.h
+class Vector {
+    public:
+        Vector(int s);
+        double& operator[](int i);
+        int size();
+    private:
+        double* elemen;
+        int sz;
+};
+//Vector.cpp
+#include "Vector.h"
+
+Vector::Vector(int s)
+    :elem{new double[s]}, sz{s} {}
+    
+    double& Vector::operator[](int i){
+        return elem[i];
+    }
+    
+    int Vector::size(){
+        return sz;
+    }
+
+//user.cpp
+#include "Vector.h"
+#include <cmath>
+using namesapce std;
+
+double sqrt_sum(Vector& v){
+    double sum =0;
+    for(i=0; i!=v.size(); i++){
+        sum +=sqrt(v[i]);
+    }
+    return sum;
+}
+
+------------------------------------------------------------------------------
+namespaces: are a way to avoid naming clash. in this example he creates a namespace where a function main is, this could bring troubles bcs could be interpreted as the main of the global namespace, so when putting into its own namespace differentiates them.
+
+
+namespace mycode{
+    class complex{.....}
+    complex sqrt(complex);
+    int main();
+}
+
+int mycode::main(){
+    complex z {1,2};
+    ....
+};
+
+int main(){
+    return mycode::main();
+}
+
+
+
+----------------------------------------------------------------------------------
+Exception handling:
+
+double& Vector::operator[])int i){
+    if(i<0 || size()<=i) throw out_of_range{"Vector::operator[]"};
+    return elem[i];
+}
+
+here instead of return the elem[i] it returns an exception of out_of_range type that should be catch by the function that calls the operator[].
+
+void f(Vector& v){
+    try{...}
+    catch(out_of_range){....}
+};
+
+
+In this case the out_of_range exception type is defined in the std lib.
+
+---------------------------------------------------------------------------------
+Exception report errors at run time, but you can also detect errors at compilation time:
+static_assert(4<= sizeof(int), "integers are too small")
+
+statiuc assertion can be used in everything that can be expressed in term of constant expressions
+
+-------------------------------------------------------------------------------------
+-Concrete classes:
+they behave just like built-in types, for example the class complex.
+
+-Container: is an object that holds a collection of different elements.
+
+    In a class the consturctor is defined by the function that contains the same name that the class itself, the destructor is ~name.
+
+
+-Abstract types: The examples of vector and complex are concrete classes since their implemnetation is part of its definition. Asbtract types insulate the user from the implmentation details.
+
+    There is an internal function with the keyword virtual, that meas that the function may be redefined later by a class derived from this one.
+
+
+------------------------------------------------------------------------------------
+-Copy and move: To avoid reference to the same memory space, he add the copy function into the vector class:
+
+class Vector {
+    private:
+        double* elem;
+        int sz;
+    public:
+    Vector(int s);
+    ~Vector(){delete[] elem;}
+
+    Vector(const Vector &a);            //copy constructor
+    Vector% operator=(const Vector& a)  //copy assignmente
+
+    double& operator[](int i)
+    const double& operator[](int i) const;
+
+    int size() const;
+}
+
+
+To move he adds the following functions_:
+    Class Vector{
+        ....
+        Vector(const Vector& a);                //copy constructor
+        Vector& operator=(const Vector& a);     //copy assignment
+        Vector(Vector&& a);                     //move constructor
+        Vector& operator=(Vector&& a);          //move assignment
+
+    }
+
+The && meas rvalue reference. An rvalue is in simplified way a value that you cannot assign to
+
+There is an std::move() operation
+
+Copying or moving for a class hierarchy is typically a dissaster as we dont have to know the members of the derived class, so what he does is to delete them.
+Class Shape{
+    public:
+        Shape(const Shape&) =delete             //no copy operation
+        Shape& operator=(const Shape) =delete   
+
+        Shape(Shape&&) = delete                 //no movement operation
+        Shape&& operator=(Shape &&) = delete    
+}
+
+If you need to copy a class it is better to create a clone type of function
+
+-------------------------------------------------------------------------------
+Templates:
+template <typename T>
+Class Vector{
+    private:
+        T* elem;
+        int sz;
+    public:
+        Vector(int s)                   //constructor
+        ~Vector() {delete[] elem}       //destructor
+        //copy and move operators
+
+        T& operator[] (int i):
+        const T& operator[](int i) const;
+        int size() const {return sz;}
+}
+
+and the member functions would look like:
+
+template<typename T>
+Vector<T>::Vector(int s){
+    if(s<0) throw Negative_size();
+    elem = new T[s];
+    sz = s;
+}
+
+template<typename T>
+const T& Vector<T>::operator[](int i) const{
+    if(i<0 || size() <=i){
+        throw out_of_range("Vector::operator[]");
+    }
+    return elem[i];
+}
+
+
+And you can define the vectors as:
+Vector<char> vc(200);   Vector<string> vs(17);
+Vector<list<int>> vli(45);  vector of 45 list of ints
+
+-------------------------------------------------------------------------------
+Standard library:
+
+<algorithm>     copy(), find(), sort()
+<array>         array
+<chrono>        duration,time_point
+<cmath>         sqrt(), pow()
+<complex>       complex, sqrt(), pow()
+<fstream>       fstream, ifstream, ofstream
+<future>        future, promise
+<iostream>      istream, ostream, cin, cout
+<map>           map, multimap
+<memory>        unique_ptr, shared_ptr, allocator
+<random>        default_random_engine, normal_distribution
+<regex>         regex, smatch
+<string>        string, basic_string
+<set>           set, multiset
+<sstream>       istrstream, ostrstream
+<thread>        thread
+<unordered_map> unordered_map, unordered_multimap
+<utility>       move(), swap(), pair
+<vector>        vector
+
+------------------------------------------------------------------------------
+String: common operations:
+    string name = "asdqweqwe"
+    name.substr(6,10)    ##take a substr from name formed by the chars 6-10
+    name.replace(0,5,"nicholas")    #
+    name[0] = touuper(name[0])
+
+------------------------------------------------------------------------------
+iostring:
+allows the programmer to define I/o for its own types.
+
+struct Entry{
+    string name;
+    int number;
+}
+//now define the output of this struct
+ostream& operator<<(ostream& os, const Entry& e){
+    return os <<"{\""<< e.name << "\", "<< e.number << "}";
+}
+
+There is also a istream, but is more tedious bcs it should check that the formatting is correct
+
+------------------------------------------------------------------------------
+Vector:
+The vector element is extensible with other types, for example usign the previous entry struct
+
+vector<Entry> phone_book{
+    {"David Hume", 1234},
+    {"Karl popper", 5415}
+}
+
+it has the internal function size().
+
+vector<int> v1 = {1,2,3,4}  //size 4
+vector<string>v2;           //size 0
+vector<Shape*> v3(23)       //size 23, initial element is null_ptr;
+vector<double> v4(32,9.9)   //size 32, initial element is 9.9 for the 32 eleemnts
+
+another good function is push_back() that adds an element at the end of the vector, increasing its size
+
+For what i got, vectors are copied when assigned, so when you want to avoid that you have to move them or pass pointers.
+
+He also says that vectors doesnt check the range of the vectors, and it doesnt throw and exception, so when he uses it he define a new class that inherits the vector properties and adds the code to throw the exception
+
+-------------------------------------------------------------------------------
+list:
+we use a list when we want to insert and delete elements without moving other elements
+
+list<Entry> phone_book{
+    {"David Hume", 1234},
+    {"Karl popper", 5415}
+}
+
+now instead of indexing by number he uses the names of the elements on the list:
+int get_number(const string& s){
+    for(const auto& x: phone_book){
+        if(x.name==s)
+            return x.number;
+    return 0;
+    }
+
+}
+also the std has a begin() and end() that return an iterator to the first and last element. So we could re-write the previous function as:
+
+int get_number(const string& s){
+    for (auto p=phone_book.begin(), p!=phone_book.end(); p++){
+        if(p->name ==s)
+            return p->number;
+    }   
+    return 0;
+}
+
+btw p->m is equivalent to (*p).m
+
+The list object also has the insert and erase functions:
+void f(const Entry& ee, list<Entry>::iterator p, list<Entry>::iteartor q){
+    phone_book.insert(p,ee)     //inserts ee before the element referred by p
+    phone_book.erase(q)         //erase the element at q    
+}   
+------------------------------------------------------------------------------
+map:
+its is an associative array or dictionary implemented as a balanced binary tree
+
+map<string, int> phone_book{
+    {"David Hume", 1234},
+    {"Karl popper", 5415}
+}
+
+
+here the first element is the key, and given the key the map return the value.
+
+if a key isnt found a new element is entered to the map with the not found key and with the default value.
+If you dont want that you could use the functions find() and insert()
+
+-------------------------------------------------------------------------------
+unordered_map:
+it uses a hashing table to store the items..
+-------------------------------------------------------------------------------
+Algorithms:
+
+p = find(b,e,x)     //p is the first p in [b:e) that *p=x
+p = fund_if(b,e,f)  //p is the first p in [b:e) that f(*p)=true
+n = count(b,e,x)    //number of elements *q in [b:e) that *q==x
+n = count_if(b,e,f)
+replace(b,e,v,v2)   //replace *q in [b:e) so that *q==v by v2
+replace_if(b,e,f,v2)
+p = copy(b,e,out)   //copy [b:e) to [out:p)
+p = copy_if(b,e,out,f)   //copy elements *q from [b:e) such that f(*q)== true to [out:p)
+p = unique_copy(b,e,out) //dont copy adjacent cuplicates
+sort(b,e)
+sort(b,e,f)         //sorting [b,e) using f as criterion
+(p1,p2) = equal_range(b,e,v) //p1:p2 is the subsequence of the sorted [b:e) with the value v.
+p = merge(b,e,v2,e2,out)    //merge two sorted sequences [b:e) and [b2:e2) into [out:p)
+
+-------------------------------------------------------------------------------
+Concurrency:
+
+unique_ptr: represents unique ownership
+shared_ptr: represents shared ownership
+
+unique_ptr ensures destruction of the object when exiting its function.
+
+**remember that you could allocate space with new, but if you do so in a function you must destroy it..
+
+shared_points are copied instead of moved. The shared_ptr is only destroyed when the last of of its shared_ptr is destroyed.
+-------------------------------------------------------------------------------
+Task and threads:
+A task is a function that can be executed concurrently, a thread is the system-level repesentation of a task in a program.
+
+void() f;
+
+struct F{
+    void operator()();  //F's call operator
+}
+
+void user(){
+    std::thread t1{f}    //f() executes in a separated thread
+    std::thread t2{F()}  //F() executes in a separated thread
+
+    t1.join()           //wait for t1
+    t2.join()
+}
+
+
+threads of a program shared a single address space (they shared data)
+
+-------------------------------------------------------------------------------
+pass arguments:
+
+void f(vector<doubles>& v);
+
+struct F{
+    vector <double>& v;
+    F(vector<double>& vv) :v{vv}{}
+    void operator()();
+}
+
+
+int main(){
+    vector<double> asd {1,2,3,4};
+    vector<double> qwe {23,4,5,1};
+
+    thread t1 {f, asd};
+    thread t2 {F{vec2}};
+
+    t1.join();
+    t2.join();
+
+}
+
+
+To return a value from a thread a way is to pass it as an argument
+void f(const vector<double>& v, double* res);
+
+class F{
+    public:
+        F(const vector<double>& vv, double* p) :v{vv},res{p} {}
+        void operator()();
+    private:
+        const vector<double>& v;
+        double *res;
+}
+
+int main(){
+    vector<double> v1;
+    vector<double> v2;
+    double res1, res2;
+    thread t1{f, v1, &res1};
+    thread t2{F{v2,&res2}}:
+    t1.join();
+    t2.join();
+
+}
+--------------------------------------------------------------------------------
+Sharing data:
+mutex: mutual exclusion object. A thread acquuires a mutex using lock() operation.
+
+mutex m;
+int sh;
+
+void f(){
+    unique_lock<mutex> lck{m}; //acquires the mutex
+    sh +=1;
+    //release mutex
+}
+
+in this case if one thread has the mutex the others has to wait until it releases to continue its operations
+
+could be the case that a thread got one mutex1 and tries to get mutex2 while other thread has mutex2 and is waiting for mutex1.. so the program will crash.
+To handle this situation the std adds te defer_lock option that will only try to run when it has all the mutex..
+
+void f(){
+    unique_lock<mutex> lck1 {m1,defer_lock};    //dont try to get the mutex yet
+    unique_lock<mutex> lck2 {m2,defer_lock};    //dont try to get the mutex yet
+    lock(lck1, lkc2);                           //here it tries to got the two mutex
+
+
+}
+
 
 

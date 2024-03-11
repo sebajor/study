@@ -1,0 +1,2 @@
+sudo apt install libspdlog-dev   ---> logger library
+sudo apt install libfftw3-dev   ---> fftw3

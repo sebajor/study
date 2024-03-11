@@ -1,0 +1,4 @@
+
+In c++11 the initialization of hte variables is something like:
+int d {7};
+int d = {7};

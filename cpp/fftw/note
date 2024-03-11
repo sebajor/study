@@ -1,1 +1,4 @@
+for this you need to install:
+    sudo apt install libfftw3-dev
+
 g++ test.cpp -o test -L/usr/lib -lfftw3 && ./test
