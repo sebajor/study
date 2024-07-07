@@ -1,5 +1,9 @@
+#include "../includes/lib_test.h"
 #include <iostream>
 
 int main(){
-    std::cout << "asdsad" << std::endl;
+    int x {};
+    std::cin >> x;
+    print_int(x);
+    return 0;
 }
