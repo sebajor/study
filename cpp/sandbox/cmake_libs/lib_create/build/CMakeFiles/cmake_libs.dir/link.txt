@@ -1,0 +1,2 @@
+/usr/bin/ar qc libcmake_libs.a CMakeFiles/cmake_libs.dir/adder.cpp.o
+/usr/bin/ranlib libcmake_libs.a

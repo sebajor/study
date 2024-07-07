@@ -1,0 +1,3 @@
+/home/seba/Workspace/study/cpp/sandbox/cmake_libs/lib_create/build/CMakeFiles/cmake_libs.dir
+/home/seba/Workspace/study/cpp/sandbox/cmake_libs/lib_create/build/CMakeFiles/edit_cache.dir
+/home/seba/Workspace/study/cpp/sandbox/cmake_libs/lib_create/build/CMakeFiles/rebuild_cache.dir

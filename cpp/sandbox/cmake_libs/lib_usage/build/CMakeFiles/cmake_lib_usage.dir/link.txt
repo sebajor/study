@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/cmake_lib_usage.dir/main.cpp.o -o cmake_lib_usage   -L/home/seba/Workspace/study/cpp/sandbox/cmake_libs/lib_usage/source/../../lib_create/build  -Wl,-rpath,/home/seba/Workspace/study/cpp/sandbox/cmake_libs/lib_usage/source/../../lib_create/build -lcmake_libs 
