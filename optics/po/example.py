@@ -22,7 +22,7 @@ plane_points = 128
 
 #target points where to compute the E_r, H_r. Just took a plane at a given z
 reflect_width = 100*wavel#8*apu.m
-reflect_height = 2000*wavel #plane_height-1*wavel
+reflect_height = 2101*wavel #plane_height-1*wavel
 reflect_points = 128
 
 ##source parameters
@@ -67,11 +67,48 @@ print("parallel integration took %.4f"%(time.time()-start))
 
 ##vectorized
 start = time.time()
-E_r_k = kirchhoff_propagation_vector(plane_pos, -n, ds, E_i_kf, scatter_pos, wavel)
+E_r_k = kirchhoff_propagation_batch(plane_pos, -n, ds, E_i_kf, scatter_pos, wavel,
+                                    max_threads=max_threads, batch_size=batch_size)
 print("vector integration took %.4f"%(time.time()-start))
 
 
 E_po = E_r_po.reshape((reflect_points, reflect_points,3))*apu.V/apu.m
 E_kf = E_r_k.reshape((reflect_points, reflect_points))
+
+
+fig, axes = plt.subplots(3,2)
+
+axes[0,0].pcolormesh(xv_s.to_value(apu.m), yv_s.to_value(apu.m), np.abs(E_po[:,:,0].to_value(apu.V/apu.m)))
+axes[0,1].pcolormesh(xv_s.to_value(apu.m), yv_s.to_value(apu.m), np.angle(E_po[:,:,0].to_value(apu.V/apu.m)))
+axes[1,0].pcolormesh(xv_s.to_value(apu.m), yv_s.to_value(apu.m), np.abs(E_kf[:,:].to_value(apu.V/apu.m)))
+axes[1,1].pcolormesh(xv_s.to_value(apu.m), yv_s.to_value(apu.m), np.angle(E_kf[:,:].to_value(apu.V/apu.m)))
+
+axes[2,0].plot(xv_s[0,:].to_value(apu.m), 20*np.log10(np.abs(E_po[reflect_points//2,:,0].to_value(apu.V/apu.m))), color='red', label='PO $E_{x}$')
+axes[2,0].plot(xv_s[0,:].to_value(apu.m), 20*np.log10(np.abs(E_kf[reflect_points//2,:].to_value(apu.V/apu.m))), color='black', ls='--', label='KF $E}$')
+
+axes[2,1].plot(xv_s[0,:].to_value(apu.m), np.rad2deg(np.angle(E_po[reflect_points//2,:,0].to_value(apu.V/apu.m))), color='red', label='PO $E_{x}$')
+axes[2,1].plot(xv_s[0,:].to_value(apu.m), np.rad2deg(np.angle(E_kf[reflect_points//2,:].to_value(apu.V/apu.m))), color='black', ls='--', label='KF $E$')
+
+axes[0,0].set_title("PO abs($E_x$)")
+axes[0,1].set_title("PO angle($E_x$)")
+
+axes[1,1].set_title("KF angle(E)")
+axes[1,0].set_title("KF abs(E)")
+
+
+axes[2,0].set_title("X cut abs")
+axes[2,1].set_title("X cut angle")
+axes[2,0].set_ylabel('dB')
+axes[2,1].set_ylabel('deg')
+axes[2,0].grid()
+axes[2,1].grid()
+axes[2,0].legend()
+axes[2,1].legend()
+
+
+
+plt.show()
+
+
 
 
