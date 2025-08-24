@@ -13,8 +13,8 @@ freq = 100*apu.GHz
 wavel = cte.c/freq
 
 #PEC surface parameters
-plane_width = 1*apu.m
-plane_height = 2*wavel#2*apu.m
+plane_width = wavel*10#1*apu.m
+plane_height = wavel*1000#2*wavel#2*apu.m
 circle_radius = 0.5*apu.m
 plane_points = 128
 
@@ -23,6 +23,9 @@ reflect_width = 8*apu.m
 reflect_height = 1*wavel #plane_height-1*wavel
 reflect_points = 128
 
+##threads
+max_threads = 8
+batch_size = 256
 
 
 ####
@@ -31,6 +34,7 @@ xv, yv = np.meshgrid(x,x)
 
 plane_params = np.zeros(5)
 plane_params[0] = plane_height.to_value(apu.m)
+plane_params[1:] = np.random.random(4)
 
 plane_pos, n, ds = deformed_circular_reflector(xv, yv, circle_radius, plane_params)
 
@@ -44,15 +48,28 @@ xv_s, yv_s = np.meshgrid(xs,xs)
 scatter_pos = apu.Quantity((xv_s.flatten(), yv_s.flatten(), reflect_height*np.ones(reflect_points**2))).T
 
 ##propagate
-"""
+
 start = time.time()
-E_r = kirchhoff_propagation(plane_pos, -n, ds, E_i, scatter_pos, wavel)
+E_r0 = kirchhoff_propagation(plane_pos, -n, ds, E_i, scatter_pos, wavel)
 print("integration took %.4f"%(time.time()-start))
-"""
+
 ##vectorized
 start = time.time()
-E_r = kirchhoff_propagation_vector(plane_pos, -n, ds, E_i, scatter_pos, wavel)
+E_r1 = kirchhoff_propagation_vector(plane_pos, -n, ds, E_i, scatter_pos, wavel)
 print("vector integration took %.4f"%(time.time()-start))
+
+start = time.time()
+E_r2 = kirchhoff_propagation_batch(plane_pos, -n, ds, E_i, scatter_pos, wavel, max_threads=max_threads,
+                                   batch_size=batch_size, vector_worker=0)
+print("batch integration took %.4f"%(time.time()-start))
+
+start = time.time()
+E_r3 = kirchhoff_propagation_batch(plane_pos, -n, ds, E_i, scatter_pos, wavel, max_threads=max_threads,
+                                   batch_size=batch_size, vector_worker=1)
+print("batch vector integration took %.4f"%(time.time()-start))
+
+E_r = E_r1
+
 
 
 
@@ -76,7 +93,7 @@ axes[0,1].set_title('asb(FFT(E))')
 axes[1,1].set_title('angle FFT(E)')
 
 
-
+plt.show()
 
 
 

@@ -137,6 +137,7 @@ def cassegrain_cylindrical(pr_v, pt_v, sr_v, st_v,
 
         s: oversize of the secondary, this controls the spillover (s>=1)
 
+        B: is the focal plane position.. in principle it will be at (0,0,B)
     """
     d1 = np.max(pr_v)*2
     d2 = np.max(sr_v)*2
@@ -154,6 +155,6 @@ def cassegrain_cylindrical(pr_v, pt_v, sr_v, st_v,
     s_surf_pos[:,2] += z0
     p_surf_pos, p_n, p_ds = paraboloid_cylindrical(pr_v, pt_v, primary_focus, d1)
     B = m*(primary_focus-L)-L       ##system focus
-    return ([p_surf_pos, p_n, p_ds], [s_surf_pos, s_n, s_ds], B)
+    return ([p_surf_pos, p_n, p_ds], [s_surf_pos, s_n, s_ds], -B)
 
 
