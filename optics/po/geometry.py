@@ -124,4 +124,36 @@ def hyperboloid_cylindrical(rv, tv, a,b):
 
 
 
+def cassegrain_cylindrical(pr_v, pt_v, sr_v, st_v,
+                           primary_focus,  f_d,
+                           s =1
+                           ):
+    """
+        pr_v: primary radii values (meshgrid)
+        pt_v: primaey theta values (meshgrid)
+        sr_v: secondary radii values (meshgrid)
+        st_v: secondary theta values (meshgrid)
+        f_d:  cassegrain sys focal ratio (f/D) 
+
+        s: oversize of the secondary, this controls the spillover (s>=1)
+
+    """
+    d1 = np.max(pr_v)*2
+    d2 = np.max(sr_v)*2
+    F_eff = f_d*d1
+    m = F_eff/primary_focus         ##magnification
+    L = primary_focus*(1-d2/d1/s)   ##vertex position of the hyperboloid
+    B = m*(primary_focus-L)-L       ##feed position
+    ###secondary parameters
+    z0 = (primary_focus-B)/2
+    c = (primary_focus+B)/2
+    a = L-z0
+    b = np.sqrt(c**2-a**2)
+    ###
+    s_surf_pos, s_n, s_ds = hyperboloid_cylindrical(sr_v, st_v, a,b)
+    s_surf_pos[:,2] += z0
+    p_surf_pos, p_n, p_ds = paraboloid_cylindrical(pr_v, pt_v, primary_focus, d1)
+    B = m*(primary_focus-L)-L       ##system focus
+    return ([p_surf_pos, p_n, p_ds], [s_surf_pos, s_n, s_ds], B)
+
 

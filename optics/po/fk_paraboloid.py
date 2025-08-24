@@ -25,7 +25,7 @@ focus = 4.8*apu.m#8*diameter
 ##source parameters
 source_x0 = np.array([0,0,100]).T*apu.m
 k_hat = np.array((0,0,-1)).T
-E0 = np.array((1,0,0)).T*apu.V/apu.m
+E0 = np.array((0,1,0)).T*apu.V/apu.m
 
 
 

@@ -21,8 +21,8 @@ circle_radius = 0.5*apu.m
 plane_points = 128
 
 #target points where to compute the E_r, H_r. Just took a plane at a given z
-reflect_width = 10*wavel#8*apu.m
-reflect_height = 1000*wavel #plane_height-1*wavel
+reflect_width = 100*wavel#8*apu.m
+reflect_height = 2000*wavel #plane_height-1*wavel
 reflect_points = 128
 
 ##source parameters
