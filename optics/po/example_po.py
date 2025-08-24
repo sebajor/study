@@ -36,6 +36,7 @@ xv, yv = np.meshgrid(x,x)
 
 plane_params = np.zeros(5)
 plane_params[0] = plane_height.to_value(apu.m)
+#plane_params[1:] = np.random.random(4)
 
 plane_pos, n, ds = deformed_circular_reflector(xv, yv, circle_radius, plane_params)
 
@@ -45,7 +46,7 @@ plane_pos, n, ds = deformed_circular_reflector(xv, yv, circle_radius, plane_para
 ###
 eta0 = np.sqrt(cte.mu0/cte.eps0)
 H_i = np.zeros(plane_pos.shape, dtype=complex)*apu.A/apu.m
-H_i[:,1] = 1*apu.V/apu.m/eta0
+H_i[:,0] = 1*apu.V/apu.m/eta0
 
 ###
 xs= np.linspace(-reflect_width/2, reflect_width/2, reflect_points)
