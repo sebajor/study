@@ -186,7 +186,7 @@ def compute_reflected_fields_batch(surface_points,ds, Je, field_positions, wavel
         ##finally we re-interpret once again the arrays
     #E_r = np.frombuffer(E_r.get_obj(), dtype=np.complex128).reshape(shape)
     #H_r = np.frombuffer(H_r.get_obj(), dtype=np.complex128).reshape(shape)
-    E_r = np.frombuffer(E_r, dtype=np.complex128).reshape(shape)
-    H_r = np.frombuffer(H_r, dtype=np.complex128).reshape(shape)
+    E_r = np.frombuffer(E_r, dtype=np.complex128).reshape(shape)*apu.V/apu.m
+    H_r = np.frombuffer(H_r, dtype=np.complex128).reshape(shape)*apu.A/apu.m
     return E_r, H_r
 

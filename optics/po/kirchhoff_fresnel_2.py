@@ -67,21 +67,8 @@ def kirchhoff_propagation_vector(surface_points, surface_normal, ds, incident_E,
 
 
 
-def kf_worker(surface_points, surface_normal, ds, incident_E, propagation_vector, 
-              field_positions, wavelength, k, indices, E_r, shape):
-    """
-        surface_points      : (:,3) array with the postions of the surface
-        surface_normal      : (:,3) normal vector of the surface
-        ds                  : (:) differential area
-        incident_E          : (:) incident field values
-        propagation_vector  : (:,3) associated propagtion direction of E
-        field_positions     : (:,3) position where you want to compute the field
-        wavelenght          :
-        k                   : k value
-        indices             : indices fo the field_positions where the thread works
-        E_r                 : reflected field
-        shape               : shape of the reflected field
-    """
+def kf_worker(surface_points, surface_normal, ds, incident_E, field_positions,
+              wavelength, k, indices, E_r, shape):
     E_r_local = np.frombuffer(E_r, dtype=np.complex128).reshape(shape)
     
     for i in indices:
@@ -93,15 +80,13 @@ def kf_worker(surface_points, surface_normal, ds, incident_E, propagation_vector
         R_hat = R/r[:,None]
         
         cos_nr = np.sum(surface_normal*R_hat, axis=1)   ##dot product, the values should be normalized!
-        cos_sr = np.sum(surface_normal*propagation_vector, axis=1)
-        cos = cos_nr+cos_sr
-        aux = np.exp(-1j*k*r)/r*incident_E*cos*ds
+        aux = np.exp(-1j*k*r)/r*incident_E*cos_nr*ds
         ##write data out
-        E_r_local[i] = (1j/(2*wavelength)*np.sum(aux)).to_value(apu.V/apu.m)
+        E_r_local[i] = (1j/(wavelength)*np.sum(aux)).to_value(apu.V/apu.m)
 
 
-def kf_worker_vector(surface_points, surface_normal, ds, incident_E, propagation_vector,
-                     field_positions, wavelength, k, indices, E_r, shape):
+def kf_worker_vector(surface_points, surface_normal, ds, incident_E, field_positions,
+                     wavelength, k, indices, E_r, shape):
     E_r_local = np.frombuffer(E_r, dtype=np.complex128).reshape(shape)
     R = field_positions[None,indices,:]- surface_points[:,None,:]
     r = np.sqrt(np.sum(R**2, axis=2))
@@ -111,8 +96,8 @@ def kf_worker_vector(surface_points, surface_normal, ds, incident_E, propagation
 
 
 
-def kirchhoff_propagation_batch(surface_points, surface_normal, ds, incident_E, propagation_vector,
-                                field_positions, wavelength, batch_size=32, max_threads=6, vector_worker=False):
+def kirchhoff_propagation_batch(surface_points, surface_normal, ds, incident_E, field_positions,
+                               wavelength, batch_size=32, max_threads=6, vector_worker=False):
     if(vector_worker):
         func = kf_worker_vector
     else:
@@ -137,7 +122,6 @@ def kirchhoff_propagation_batch(surface_points, surface_normal, ds, incident_E, 
                                                  surface_normal,
                                                  ds, 
                                                  incident_E,
-                                                 propagation_vector,
                                                  field_positions,
                                                  wavelength,
                                                  k,
@@ -173,8 +157,6 @@ def kirchhoff_propagation_batch(surface_points, surface_normal, ds, incident_E, 
     #E_r = np.frombuffer(E_r.get_obj(), dtype=np.complex128).reshape(shape)
     #H_r = np.frombuffer(H_r.get_obj(), dtype=np.complex128).reshape(shape)
     E_r = np.frombuffer(E_r, dtype=np.complex128).reshape(shape)*apu.V/apu.m
-    
-    ##I need to compute the reflected propagation vector.
     return E_r
 
 

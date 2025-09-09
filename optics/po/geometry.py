@@ -117,7 +117,9 @@ def hyperboloid_cylindrical(rv, tv, a,b):
     nx = -dz_dr*rv*np.cos(tv)/(np.sqrt(1+dz_dr))
     ny = -dz_dr*rv*np.sin(tv)/(np.sqrt(1+dz_dr))
     nz = 1/(np.sqrt(1+dz_dr))
-    norm = np.array((nx,ny,nz)).T
+    norm = np.array((nx,ny,nz))
+    norm = norm/np.sqrt(np.sum(norm**2, axis=0))
+    norm = norm.reshape((3,-1)).T           ##CHECK!!!
     ds = rv*np.sqrt(1+dz_dr**2)*(rv[0,1]-rv[0,0])*(tv[1,0]-tv[0,0])
     ds = ds.flatten()
     return surf_pos, norm, ds

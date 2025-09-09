@@ -17,7 +17,7 @@ wavel = cte.c/freq
 #PEC surface parameters
 plane_width = 1*apu.m
 plane_height = 2*wavel#2*apu.m
-circle_radius = 0.5*apu.m
+circle_radius =0.25*apu.m# 0.5*apu.m
 plane_points = 128
 
 #target points where to compute the E_r, H_r. Just took a plane at a given z
@@ -43,7 +43,7 @@ xv, yv = np.meshgrid(x,x)
 
 plane_params = np.zeros(5)
 plane_params[0] = plane_height.to_value(apu.m)
-#plane_params[1:] = np.random.random(4)
+#plane_params[1:] = np.random.random(4)*5
 
 plane_pos, n, ds = deformed_circular_reflector(xv, yv, circle_radius, plane_params)
 
@@ -67,12 +67,12 @@ print("parallel integration took %.4f"%(time.time()-start))
 
 ##vectorized
 start = time.time()
-E_r_k = kirchhoff_propagation_batch(plane_pos, -n, ds, E_i_kf, scatter_pos, wavel,
+E_r_k = kirchhoff_propagation_batch(plane_pos, -n, ds, E_i_kf, k_hat, scatter_pos, wavel,
                                     max_threads=max_threads, batch_size=batch_size)
 print("vector integration took %.4f"%(time.time()-start))
 
 
-E_po = E_r_po.reshape((reflect_points, reflect_points,3))*apu.V/apu.m
+E_po = E_r_po.reshape((reflect_points, reflect_points,3))
 E_kf = E_r_k.reshape((reflect_points, reflect_points))
 
 

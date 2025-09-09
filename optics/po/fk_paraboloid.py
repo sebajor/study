@@ -25,7 +25,7 @@ focus = 4.8*apu.m#8*diameter
 ##source parameters
 source_x0 = np.array([0,0,100]).T*apu.m
 k_hat = np.array((0,0,-1)).T
-E0 = np.array((0,1,0)).T*apu.V/apu.m
+E0 = np.array((1,0,0)).T*apu.V/apu.m
 
 
 
@@ -65,8 +65,12 @@ scatter_pos = apu.Quantity((xv_s.flatten(), yv_s.flatten(), reflect_height*np.on
 
 
 start = time.time()
-E_r_v = kirchhoff_propagation_vector(surf_points, n, ds, E_i_kf, scatter_pos, wavel)
+#E_r_v = kirchhoff_propagation_vector(surf_points, n, ds, E_i_kf, scatter_pos, wavel)
 #E_r = kirchhoff_propagation(surf_points, n, ds, E_i, scatter_pos, wavel)
+
+E_r_v = kirchhoff_propagation_batch(surf_points, n, ds, E_i_kf, k_hat, scatter_pos, wavel,
+                                    max_threads=max_threads, batch_size=batch_size)
+
 print("vector integration took %.4f"%(time.time()-start))
 
 
@@ -74,8 +78,8 @@ start = time.time()
 Je = compute_induced_currents(n, H_i)      ##use -n since we are pointing down
 E_r, H_r = compute_reflected_fields_batch(surf_points, ds, Je, scatter_pos, wavel, 
                                             batch_size=batch_size, max_threads=max_threads)
-E_r_po= E_r*apu.V/apu.m
-H_r_po = H_r*apu.A/apu.m
+E_r_po= E_r
+H_r_po = H_r
 print("PO parallel integration took %.4f"%(time.time()-start))
 
 

@@ -34,7 +34,7 @@ xv, yv = np.meshgrid(x,x)
 
 plane_params = np.zeros(5)
 plane_params[0] = plane_height.to_value(apu.m)
-plane_params[1:] = np.random.random(4)
+#plane_params[1:] = np.random.random(4)
 
 plane_pos, n, ds = deformed_circular_reflector(xv, yv, circle_radius, plane_params)
 
