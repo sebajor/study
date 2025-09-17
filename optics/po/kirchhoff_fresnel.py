@@ -3,7 +3,6 @@ import matplotlib.pyplot as plt
 from astropy import units as apu
 from astropy import constants as cte
 import multiprocessing
-import ipdb
 
 ###
 ### The kirchhoff fresnel integral is an improvement over the geometrical optics
@@ -167,8 +166,8 @@ def kirchhoff_propagation_batch(surface_points, surface_normal, ds, incident_E, 
     if(remains !=0):
         print("running the remained part")
         indices = np.arange(remains)+batch_size*i
-        func(surface_points, surface_normal, ds,incident_E,field_positions,
-                    wavelength, k,indices, E_r, shape)
+        func(surface_points, surface_normal, ds,incident_E, propagation_vector, 
+             field_positions,wavelength, k,indices, E_r, shape)
         ##finally we re-interpret once again the arrays
     #E_r = np.frombuffer(E_r.get_obj(), dtype=np.complex128).reshape(shape)
     #H_r = np.frombuffer(H_r.get_obj(), dtype=np.complex128).reshape(shape)

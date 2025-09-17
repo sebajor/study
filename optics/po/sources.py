@@ -1,7 +1,7 @@
 import numpy as np
 from astropy import units as apu
 from astropy import constants as cte
-import ipdb
+#import ipdb
 
 
 class plane_wave_source():
@@ -86,7 +86,7 @@ class cylindrical_gaussian_beam():
             postions: array (..,3)
         """
         new_pos = positions-self.origin[None,:]
-        local_pos = self.direction_vectors@new_pos.T  ##matrix product
+        local_pos = np.matmul(self.direction_vectors,new_pos.T)  ##matrix product
         return local_pos.T
 
     def propagate(self, positions):

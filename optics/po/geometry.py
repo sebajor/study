@@ -2,7 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from astropy import units as apu
 from astropy import constants as cte
-import ipdb
 
 
 
@@ -113,10 +112,10 @@ def hyperboloid_cylindrical(rv, tv, a,b):
     yv = rv*np.sin(tv)
     zv = a*np.sqrt(1+rv**2/b**2)
     surf_pos = apu.Quantity([xv.flatten(),yv.flatten(),zv.flatten()]).T
-    dz_dr = a*rv/(b**2*np.sqrt(1+rv**2/b**2))
-    nx = -dz_dr*rv*np.cos(tv)/(np.sqrt(1+dz_dr))
-    ny = -dz_dr*rv*np.sin(tv)/(np.sqrt(1+dz_dr))
-    nz = 1/(np.sqrt(1+dz_dr))
+    dz_dr = a*rv/(b**2*np.sqrt(rv**2/b**2+1))
+    nx = -dz_dr*np.cos(tv)/(np.sqrt(1+dz_dr**2))
+    ny = -dz_dr*np.sin(tv)/(np.sqrt(1+dz_dr**2))
+    nz = 1/(np.sqrt(1+dz_dr**2))
     norm = np.array((nx,ny,nz))
     norm = norm/np.sqrt(np.sum(norm**2, axis=0))
     norm = norm.reshape((3,-1)).T           ##CHECK!!!
@@ -152,11 +151,12 @@ def cassegrain_cylindrical(pr_v, pt_v, sr_v, st_v,
     c = (primary_focus+B)/2
     a = L-z0
     b = np.sqrt(c**2-a**2)
+    s_focus = np.sqrt(a**2+b**2)+z0    ##this is the imaginary point where the reflected points came from 
     ###
     s_surf_pos, s_n, s_ds = hyperboloid_cylindrical(sr_v, st_v, a,b)
     s_surf_pos[:,2] += z0
     p_surf_pos, p_n, p_ds = paraboloid_cylindrical(pr_v, pt_v, primary_focus, d1)
     B = m*(primary_focus-L)-L       ##system focus
-    return ([p_surf_pos, p_n, p_ds], [s_surf_pos, s_n, s_ds], -B)
+    return ([p_surf_pos, p_n, p_ds], [s_surf_pos, s_n, s_ds], -B, s_focus)
 
 
